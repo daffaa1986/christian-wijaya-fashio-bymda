@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>harness</title>
+<style>html,body{margin:0;background:#111;color:#eee;font:13px/1.5 Consolas,monospace}
+#f{width:1280px;height:1200px;border:0;background:#fff;display:block}
+#r{padding:14px;white-space:pre-wrap}
+.ok{color:#5f5} .bad{color:#f77} .hd{color:#8cf;font-weight:bold}</style>
+</head><body>
+<div id="r">running...</div>
+<iframe id="f" title="target"></iframe>
+<script>
+var PASS = 0, FAIL = 0;
+var lines = [];
+
+function ok(cond, label, extra) {
+  if (cond) { PASS++; lines.push(['  ok  ', label].join('') + (extra ? '   [' + extra + ']' : '')); }
+  else { FAIL++; lines.push(['  FAIL', label].join('') + (extra ? '   [' + extra + ']' : '')); }
+  return cond;
+}
+
+/* Seeds use ids that exist in the current catalogue and prices in Rupiah.
+   Totals mirror Store.totals() exactly: the two seeded lines are
+   Essential Oxford Shirt 385.000 x 2 and Minimalist Wool Coat 1.940.000 x 1,
+   so subtotal = 2.710.000; standard shipping is free and
+   tax = round(2.710.000 * 0.08) = 216.800, giving 2.926.800. */
+var SEEDS = {
+  cart: { cw_cart: [
+    {id:'premium-oxford-shirt', qty:2, color:'White', size:'S'},
+    {id:'premium-minimalist-coat', qty:1, color:'Black', size:'46'}
+  ]},
+  /* A cart saved by an older build: one resolvable line plus one whose id
+     the catalogue no longer knows. The badge must not count the stale one. */
+  stale: { cw_cart: [
+    {id:'premium-oxford-shirt', qty:1, color:'White', size:'S'},
+    {id:'noir-wool-suit', qty:1, color:'Black', size:'50'}
+  ]},
+  wish: { cw_wishlist: ['premium-leather-tote','premium-gold-layered-set','premium-silk-evening-dress'] },
+  /* Explicitly empty, so the empty-state scenarios do not depend on the
+     order in which the other scenarios happen to run. */
+  empty: { cw_cart: [], cw_wishlist: [], cw_last_order: null },
+  order: {
+    cw_last_order: {
+      number:'CW-2026-48213', date:new Date().toISOString(), email:'amara@example.com',
+      name:'Amara Setiawan', phone:'+62 8123456789', country:'Indonesia',
+      address:'Jl. Merdeka 1, Bandung 40115',
+      shippingMethod:'standard', shippingTitle:'Standard Delivery',
+      paymentMethod:'card',
+      paymentDetail:{label:'Credit or debit card',cardType:'Visa'},
+      items:[{id:'premium-oxford-shirt',name:'Essential Oxford Shirt',price:385000,qty:2,color:'White',size:'S'},
+             {id:'premium-minimalist-coat',name:'Minimalist Wool Coat',price:1940000,qty:1,color:'Black',size:'46'}],
+      totals:{subtotal:2710000,shipping:0,tax:216800,total:2926800,items:3,method:'standard'}
+    },
+    cw_cart: []
+  },
+  session: { cw_user: { name:'Amara Setiawan', email:'amara@example.com', remember:true }, cw_cart: [] }
+};
+
+function seed(kind) {
+  Object.keys(SEEDS[kind] || {}).forEach(function(k){ localStorage.setItem(k, JSON.stringify(SEEDS[kind][k])); });
+}
+
+function run(kind, page) {
+  var w = document.getElementById('f').contentWindow;
+  var d = w.document;
+
+  lines.push('');
+  lines.push('=== ' + page + '  (seed: ' + (kind || 'none') + ') ===');
+
+  if (!page) return;
+
+  /* ---------- global chrome, every page ---------- */
+  var navLinks = d.querySelectorAll('.nav-primary__link');
+  ok(navLinks.length === 5, 'nav has exactly 5 primary links', navLinks.length);
+  var navHrefs = [].map.call(navLinks, function(a){ return a.getAttribute('href'); });
+  ok(navHrefs.every(function(h){ return !/^#/.test(h) && h !== 'Shop'; }), 'no dead "#" nav hrefs');
+  ok(d.querySelectorAll('footer').length === 1, 'exactly one <footer> landmark', d.querySelectorAll('footer').length);
+  ok(!!d.querySelector('main#main'), 'has <main id="main">');
+  ok(!!d.querySelector('.skip-link'), 'has skip link');
+  ok(!!d.querySelector('#auth-modal'), 'has auth modal');
+
+  /* images: every <img> in static markup must have non-empty alt or empty alt */
+  var imgBad = [].filter.call(d.querySelectorAll('img'), function(im){
+    return !im.hasAttribute('alt') || (/img[\\/]/.test(im.getAttribute('alt')||''));
+  });
+  ok(imgBad.length === 0, 'all static <img> have meaningful alt', imgBad.length + ' bad');
+
+  /* ---------- page specific ---------- */
+  if (page === 'cart.html') {
+    var badge = d.querySelector('[data-cart-count]');
+    ok(badge && badge.textContent === '3', 'cart badge shows 3 (total quantity)', badge && badge.textContent);
+    var lines2 = d.querySelectorAll('.line-item');
+    ok(lines2.length === 2, 'two cart lines rendered', lines2.length);
+    ok(!d.querySelector('[data-cart-empty]') === false, 'empty state hidden when items exist');
+    var totalTxt = (d.querySelector('.summary__row--total dd')||{}).textContent;
+    ok(/^Rp\s/.test(totalTxt||''), 'order total rendered in Rupiah', totalTxt);
+    ok(!/\$/.test(totalTxt||''), 'order total carries no $ symbol', totalTxt);
+    var rows = [].map.call(d.querySelectorAll('.summary__row'), function(r){
+      return [].map.call(r.children, function(c){return c.textContent;}).join('|');
+    });
+    var sub = (rows.filter(function(r){return r.indexOf('Subtotal|')===0;})[0]||'').split('|')[1];
+    ok(sub === 'Rp\u00a02.710.000', 'subtotal correct (385000*2 + 1940000)', sub);
+    var shipRow = (rows.filter(function(r){return r.indexOf('Shipping|')===0;})[0]||'').split('|')[1];
+    ok(shipRow === 'Free', 'standard shipping is Free', shipRow);
+    /* the summary item count must equal the navbar badge - the BUG 1 contract */
+    var itemsRow = (rows.filter(function(r){return r.indexOf('Items|')===0;})[0]||'').split('|')[1];
+    ok(itemsRow === badge.textContent, 'summary Items equals navbar badge',
+       itemsRow + ' vs ' + badge.textContent);
+    /* no stray USD anywhere in the summary */
+    ok(!/\$|USD/.test(d.querySelector('[data-cart-summary]').textContent),
+       'cart summary free of USD');
+    ok(!!d.querySelector('[data-inc]') && !!d.querySelector('[data-dec]') && !!d.querySelector('[data-remove]'),
+       'quantity and remove controls present');
+    ok(!!d.querySelector('a[href="checkout.html"]'), 'checkout CTA links to checkout.html');
+
+    /* interaction: increment quantity */
+    var before = d.querySelector('[data-cart-count]').textContent;
+    d.querySelector('[data-inc]').click();
+    var after = d.querySelector('[data-cart-count]').textContent;
+    ok(after === '4', 'clicking + increments badge 3 -> 4', before + ' -> ' + after);
+    /* interaction: remove */
+    d.querySelector('[data-remove]').click();
+    ok(d.querySelectorAll('.line-item').length === 1, 'remove deletes the line',
+       d.querySelectorAll('.line-item').length + ' left');
+    ok(!!d.querySelector('.toast'), 'a toast gives visible feedback after remove');
+  }
+
+  if (page === 'checkout.html') {
+    var sItems = d.querySelectorAll('.summary__item');
+    ok(sItems.length === 2, 'order summary lists 2 items', sItems.length);
+    ok(d.querySelectorAll('input[name="payment"]').length === 5, '5 payment methods for Indonesia',
+       d.querySelectorAll('input[name="payment"]').length);
+    var shipOpts = d.querySelectorAll('input[name="shipping"]');
+    ok(shipOpts.length === 2, '2 shipping options', shipOpts.length);
+    var shipNotes = [].map.call(d.querySelectorAll('.radio-card__note'), function(n){return n.textContent;});
+    ok(shipNotes.some(function(t){return t.indexOf('FREE - arrives in 3 to 5 working days')===0;}),
+       'standard delivery reads FREE - 3 to 5 working days', shipNotes.join(' || '));
+    ok(shipNotes.some(function(t){return t.indexOf('Rp\u00a025.000 - arrives in 1 to 2 working days')===0;}),
+       'express delivery reads Rp 25.000 - 1 to 2 working days', shipNotes.join(' || '));
+    ok(!/\$/.test(d.querySelector('[data-checkout-main]').textContent), 'no $ anywhere on checkout');
+
+    /* BUG 1: badge and summary must describe the same cart */
+    var coBadge = d.querySelector('[data-cart-count]').textContent;
+    var coRows = [].map.call(d.querySelectorAll('.summary__row'), function(r){
+      return [].map.call(r.children, function(c){return c.textContent;}).join('|');
+    });
+    var coItems = (coRows.filter(function(r){return r.indexOf('Items|')===0;})[0]||'').split('|')[1];
+    ok(coItems === coBadge, 'checkout Items equals navbar badge', coItems + ' vs ' + coBadge);
+    /* per-line Qty values must sum to that same number */
+    var qtySum = [].map.call(d.querySelectorAll('.summary__item-meta'), function(m){
+      return parseInt((m.textContent.match(/Qty\s*(\d+)/)||[])[1], 10) || 0;
+    }).reduce(function(a,b){return a+b;},0);
+    ok(String(qtySum) === coBadge, 'per-line Qty values sum to the badge',
+       qtySum + ' vs ' + coBadge);
+
+    /* express must actually move the total by exactly the flat rate */
+    var readTotal = function(){
+      var t = (coRows.filter(function(r){return r.indexOf('Total|')===0;})[0]||'').split('|')[1];
+      var rowsNow = [].map.call(d.querySelectorAll('.summary__row'), function(r){
+        return [].map.call(r.children, function(c){return c.textContent;}).join('|');
+      });
+      t = (rowsNow.filter(function(r){return r.indexOf('Total|')===0;})[0]||'').split('|')[1];
+      return { total:t,
+               ship:(rowsNow.filter(function(r){return r.indexOf('Shipping|')===0;})[0]||'').split('|')[1],
+               tax:(rowsNow.filter(function(r){return r.indexOf('Estimated tax|')===0;})[0]||'').split('|')[1] };
+    };
+    var std = readTotal();
+    var exp = d.querySelector('input[name="shipping"][value="express"]');
+    exp.checked = true; exp.dispatchEvent(new w.Event('change', {bubbles:true}));
+    var expT = readTotal();
+    ok(expT.ship === 'Rp\u00a025.000', 'express charges Rp 25.000 shipping', expT.ship);
+    var toNum = function(s){ return parseInt(String(s).replace(/[^0-9]/g,''),10); };
+    ok(toNum(expT.total) - toNum(std.total) === 25000,
+       'express raises the total by exactly Rp 25.000',
+       std.total + ' -> ' + expT.total);
+    ok(toNum(expT.tax) === toNum(std.tax), 'tax is unchanged by the shipping choice');
+    var std2 = d.querySelector('input[name="shipping"][value="standard"]');
+    std2.checked = true; std2.dispatchEvent(new w.Event('change', {bubbles:true}));
+    ok(readTotal().ship === 'Free', 'switching back to standard restores Free shipping');
+
+    /* country / phone: Indonesia selected, dialling code shown separately */
+    var ctry = d.querySelector('[name="country"]');
+    ok(!!ctry && ctry.value === 'ID', 'country defaults to Indonesia', ctry && ctry.value);
+    ok(ctry.options[ctry.selectedIndex].textContent === 'Indonesia (+62)',
+       'country option reads Indonesia (+62)', ctry.options[ctry.selectedIndex].textContent);
+    ok(d.querySelector('[data-dial]').textContent === '+62', 'dial code chip reads +62',
+       d.querySelector('[data-dial]').textContent);
+    var ph = d.querySelector('[name="phone"]');
+    ok(ph.getAttribute('autocomplete') === 'tel-national',
+       'phone input takes the national number, not a combined one',
+       ph.getAttribute('autocomplete'));
+    ph.value = '81919999'; ph.dispatchEvent(new w.Event('input', {bubbles:true}));
+    ok(d.querySelector('[data-phone-display]').textContent === 'Will be saved as +62 81919999.',
+       'phone hint composes +62 with the national number',
+       d.querySelector('[data-phone-display]').textContent);
+
+    /* Indonesian card networks and payment methods are all still present */
+    ok([].map.call(d.querySelectorAll('[name="cardtype"]'), function(r){return r.value;}).join(',')
+         === 'Visa,Mastercard,GPN', 'card networks are Visa, Mastercard, GPN',
+       [].map.call(d.querySelectorAll('[name="cardtype"]'), function(r){return r.value;}).join(','));
+    ok([].map.call(d.querySelectorAll('input[name="payment"]'), function(r){return r.value;}).join(',')
+         === 'card,va,qris,wallet,cod', 'payment methods: card, VA, QRIS, wallet, COD',
+       [].map.call(d.querySelectorAll('input[name="payment"]'), function(r){return r.value;}).join(','));
+
+    /* validation: submit empty -> field errors appear */
+    d.querySelector('[data-checkout] [type=submit]').click();
+    var errs = d.querySelectorAll('.field.is-invalid');
+    ok(errs.length > 0, 'empty submit flags invalid fields', errs.length + ' flagged');
+    var firstErrText = (d.querySelector('.field.is-invalid .field__error')||{}).textContent;
+    ok(!!firstErrText && firstErrText.length > 0, 'error message has text', firstErrText);
+
+    /* fill valid data -> success */
+    ['fullname','email','phone','address','city','postcode','cardname','cardnumber','cardexp','cardcvc']
+      .forEach(function(n){
+        var el = d.querySelector('[data-checkout] [name="'+n+'"]');
+        if (!el) return;
+        var v = { fullname:'Amara Setiawan', email:'a@b.com', phone:'08123456789',
+                  address:'Jl Merdeka 1', city:'Bandung', postcode:'40115',
+                  cardname:'A SETIAWAN', cardnumber:'4242 4242 4242 4242',
+                  cardexp:'12/29', cardcvc:'123' }[n];
+        el.value = v;
+        el.dispatchEvent(new w.Event('input', { bubbles:true }));
+      });
+    ok(d.querySelectorAll('.field.is-invalid').length === 0, 'errors clear as fields are corrected');
+    var stored = null;
+    try { stored = JSON.parse(localStorage.getItem('cw_cart')); } catch(e){}
+    ok(Array.isArray(stored), 'cart still present before submit');
+  }
+
+  if (page === 'confirmation.html') {
+    ok(!!d.querySelector('.confirm'), 'success state rendered');
+    var num = (d.querySelector('.confirm__meta-value')||{}).textContent;
+    ok(/CW-\d{4}-\d{5}/.test(num||''), 'order number shown', num);
+    ok(d.querySelectorAll('.confirm__item').length === 2, 'both items listed');
+    var btns = [].map.call(d.querySelectorAll('.confirm__actions a, .confirm__actions button'), function(b){return b.getAttribute('href')||'button';});
+    ok(btns.some(function(h){return h.indexOf('shop.html')>-1;}), 'continue shopping present');
+    ok(btns.indexOf('button') > -1, 'view order button present');
+    var cartAfter = JSON.parse(localStorage.getItem('cw_cart') || '[]');
+    ok(cartAfter.length === 0, 'cart cleared after order', cartAfter.length + ' items');
+  }
+
+  if (page === 'wishlist.html') {
+    var cards = d.querySelectorAll('.product-card');
+    ok(cards.length === 3, '3 saved pieces rendered', cards.length);
+    var wb = d.querySelector('[data-wish-count]');
+    ok(wb && wb.textContent === '3', 'wishlist badge shows 3', wb && wb.textContent);
+    /* untoggle removes the card */
+    d.querySelector('[data-wish]').click();
+    ok(d.querySelectorAll('.product-card').length === 2, 'wishlist toggle removes card',
+       d.querySelectorAll('.product-card').length + ' left');
+  }
+
+  if (page === 'shop.html') {
+    ok(d.querySelectorAll('.product-card').length === 16, '16 products by default',
+       d.querySelectorAll('.product-card').length);
+    /* category filter */
+    var men = d.querySelector('input[name="f-category"][value="men"]');
+    men.checked = true; men.dispatchEvent(new w.Event('change', {bubbles:true}));
+    ok(d.querySelectorAll('.product-card').length === 5, 'men filter -> 5 results',
+       d.querySelectorAll('.product-card').length);
+    /* search — clear category via the "All categories" radio, not .checked=false */
+    var all = d.querySelector('input[name="f-category"][value=""]');
+    all.checked = true; all.dispatchEvent(new w.Event('change', {bubbles:true}));
+    ok(d.querySelectorAll('.product-card').length === 16, 'clearing category restores 16',
+       d.querySelectorAll('.product-card').length);
+    var si = d.querySelector('[data-shop-search]');
+    si.value = 'tote'; si.dispatchEvent(new w.Event('input', {bubbles:true}));
+    return new Promise(function(res){ setTimeout(function(){
+      ok(d.querySelectorAll('.product-card').length === 1, 'search "tote" -> 1 result (Premium Leather Tote)',
+         d.querySelectorAll('.product-card').length);
+      /* empty state */
+      si.value = 'zzzznothing';
+      si.dispatchEvent(new w.Event('input', {bubbles:true}));
+      setTimeout(function(){
+        var empty = d.querySelector('[data-shop-empty]');
+        ok(empty && !empty.hidden, 'empty state shown for no matches');
+        /* sort */
+        si.value=''; si.dispatchEvent(new w.Event('input', {bubbles:true}));
+        var sort = d.querySelector('[data-sort]');
+        sort.value='price-asc'; sort.dispatchEvent(new w.Event('change',{bubbles:true}));
+        setTimeout(function(){
+          var prices = [].map.call(d.querySelectorAll('.price__now'), function(p){
+            return parseInt(p.textContent.replace(/[^0-9]/g,''),10); });
+          var sorted = prices.every(function(v,i){ return i===0 || prices[i-1] <= v; });
+          ok(sorted, 'price-asc sort is actually ascending', prices.slice(0,4).join(','));
+          res();
+        }, 250);
+      }, 250);
+    }, 250); });
+  }
+
+  if (page === 'index.html') {
+    ok(d.querySelectorAll('[data-featured-grid] .product-card').length === 8, '8 featured cards',
+       d.querySelectorAll('[data-featured-grid] .product-card').length);
+    ok(d.querySelectorAll('.cat-tile').length === 4, '4 category tiles');
+    ok(d.querySelectorAll('[data-stories-grid] .story').length === 3, '3 story cards');
+    ok(!!d.querySelector('[data-newsletter]'), 'newsletter form present');
+    var heroH1 = d.querySelectorAll('main h1');
+    ok(heroH1.length === 1, 'exactly one <h1>', heroH1.length);
+    /* Quick add renders only on cards with oldPrice:true AND an available
+       size. The badge is asserted as a delta rather than an absolute: clearing
+       cw_cart from outside the page cannot empty the running Store, because it
+       already read the cart into memory on first paint. Relative is also the
+       honest claim - quick add adds exactly one unit. */
+    var badgeBefore = parseInt(d.querySelector('[data-cart-count]').textContent, 10) || 0;
+    return new Promise(function(res){ setTimeout(function(){
+      var qa = d.querySelector('[data-quick-add]');
+      ok(!!qa, 'featured cards offer quick add');
+      if (qa) qa.click();
+      setTimeout(function(){
+      var badgeAfter = d.querySelector('[data-cart-count]').textContent;
+      ok(parseInt(badgeAfter, 10) === badgeBefore + 1,
+         'quick add bumps the cart badge by exactly 1',
+         badgeBefore + ' -> ' + badgeAfter);
+      ok(!!d.querySelector('.toast'), 'quick add shows a toast');
+      var w0 = d.querySelector('[data-wish]');
+      var wishBefore = parseInt(d.querySelector('[data-wish-count]').textContent, 10) || 0;
+      w0.click();
+      ok(parseInt(d.querySelector('[data-wish-count]').textContent, 10) === wishBefore + 1,
+         'wishlist badge -> +1',
+         d.querySelector('[data-wish-count]').textContent);
+      ok(w0.getAttribute('aria-pressed') === 'true', 'wishlist aria-pressed flips to true');
+      /* newsletter validation */
+      var nf = d.querySelector('[data-newsletter]');
+      var ni = nf.querySelector('input[type=email]');
+      ni.value = 'nope';
+      nf.dispatchEvent(new w.Event('submit', {bubbles:true, cancelable:true}));
+      var msg = nf.querySelector('[data-newsletter-msg]');
+      ok(msg && !msg.hidden && /valid/i.test(msg.textContent), 'bad newsletter email rejected',
+         msg && msg.textContent);
+      ni.value = 'amara@example.com';
+      nf.dispatchEvent(new w.Event('submit', {bubbles:true, cancelable:true}));
+      ok(!msg.hidden && /thank/i.test(msg.textContent), 'good newsletter email accepted');
+      res();
+      }, 120);
+    }, 300); });
+  }
+
+  if (page === 'about.html') {
+    var dark = d.querySelector('.section--ink h2');
+    var col = w.getComputedStyle(dark).color;
+    ok(col === 'rgb(255, 255, 255)', 'dark-section heading is white (contrast)', col);
+    ok(d.querySelectorAll('.stat').length === 8, '8 statistics', d.querySelectorAll('.stat').length);
+    ok(d.querySelectorAll('.principle').length === 3, '3 principles');
+    ok(d.querySelector('#craft'), 'craftsmanship anchor present');
+  }
+
+  if (page === 'promotion.html') {
+    ok(d.querySelectorAll('.promo-card').length === 4, '4 promotion cards', d.querySelectorAll('.promo-card').length);
+    var offers = [].map.call(d.querySelectorAll('.promo-card__offer'), function(e){return e.textContent.trim();});
+    ok(offers.length === 4, 'each promo shows an offer', offers.join(' | '));
+  }
+
+  /* ---------- login / signup validation ---------- */
+  if (page === 'login-check') {
+    var m = d.querySelector('#auth-modal');
+    ok(!m.classList.contains('is-open'), 'modal starts closed');
+    d.querySelector('[data-auth-open]').click();
+    ok(m.classList.contains('is-open'), 'Login button opens the modal');
+    ok(m.getAttribute('aria-hidden') === 'false', 'aria-hidden toggled to false');
+    /* focus is applied on the next frame — check after a beat */
+    return new Promise(function(res0){ setTimeout(function(){
+      ok(d.activeElement && d.activeElement.id === 'login-email', 'focus moved into the first field',
+         d.activeElement && (d.activeElement.id || d.activeElement.tagName));
+      res0();
+    }, 120); }).then(function(){
+    /* bad email + short password */
+    var lf = d.querySelector('#login-form');
+    lf.email.value = 'not-an-email';
+    lf.password.value = 'short';
+    lf.dispatchEvent(new w.Event('submit', {bubbles:true, cancelable:true}));
+    var bad = lf.querySelectorAll('.field.is-invalid').length;
+    ok(bad >= 2, 'invalid email + short password flagged', bad + ' fields');
+    /* forgot password gives feedback */
+    d.querySelector('[data-forgot]').click();
+    var fm = d.querySelector('[data-auth-message]');
+    ok(fm && !fm.hidden && fm.textContent.length > 0, 'forgot password shows a message',
+       fm && fm.textContent.slice(0, 40));
+    /* valid login */
+    lf.email.value = 'amara@example.com';
+    lf.password.value = 'longenough1';
+    lf.dispatchEvent(new w.Event('submit', {bubbles:true, cancelable:true}));
+    return new Promise(function(res){ setTimeout(function(){
+      ok(!m.classList.contains('is-open'), 'modal closes on successful login');
+      var lbl = (d.querySelector('[data-auth-label]')||{}).textContent;
+      ok(lbl === 'Amara', 'nav Login label becomes first name', lbl);
+      ok(d.querySelector('[data-auth-action]').getAttribute('data-mode') === 'logout',
+         'auth button switches to logout mode');
+      /* logout */
+      d.querySelector('[data-auth-action]').click();
+      setTimeout(function(){
+        ok((d.querySelector('[data-auth-label]')||{}).textContent === 'Login', 'logout restores Login label');
+        res();
+      }, 120);
+    }, 150); });
+  });   /* closes .then() opened for the focus assertion */
+  }
+
+  /* ---------- signup validation ---------- */
+  if (page === 'signup-check') {
+    var m2 = d.querySelector('#auth-modal');
+    d.querySelector('[data-auth-open]').click();
+    d.querySelector('[data-tab="signup"]').click();
+    ok(!d.querySelector('[data-panel="signup"]').hidden, 'Sign up tab reveals the sign-up panel');
+    ok(d.querySelector('#tab-signup').getAttribute('aria-selected') === 'true', 'tab aria-selected moves');
+    var sf = d.querySelector('#signup-form');
+    /* terms not ticked */
+    sf.fullname.value = 'Amara Setiawan';
+    sf.email.value = 'amara@example.com';
+    sf.password.value = 'password123';
+    sf.confirm.value = 'password123';
+    sf.terms.checked = false;
+    sf.dispatchEvent(new w.Event('submit', {bubbles:true, cancelable:true}));
+    ok(!JSON.parse(localStorage.getItem('cw_user') || 'null'), 'terms unchecked blocks sign up');
+    /* mismatched confirm */
+    sf.terms.checked = true;
+    sf.confirm.value = 'DIFFERENT';
+    sf.dispatchEvent(new w.Event('submit', {bubbles:true, cancelable:true}));
+    var bad2 = sf.querySelectorAll('.field.is-invalid').length;
+    ok(bad2 >= 1, 'mismatched confirmation flagged', bad2 + ' fields');
+    /* short password */
+    sf.password.value = 'abc';
+    sf.confirm.value = 'abc';
+    sf.dispatchEvent(new w.Event('submit', {bubbles:true, cancelable:true}));
+    var shortErr = (sf.querySelector('[name=password]').closest('.field').querySelector('.field__error')||{}).textContent;
+    ok(/8 characters/i.test(shortErr || ''), 'short password rejected with a helpful message', shortErr);
+    /* valid */
+    sf.password.value = 'password123';
+    sf.confirm.value = 'password123';
+    sf.dispatchEvent(new w.Event('submit', {bubbles:true, cancelable:true}));
+    return new Promise(function(res){ setTimeout(function(){
+      var u = JSON.parse(localStorage.getItem('cw_user') || 'null');
+      ok(u && u.email === 'amara@example.com', 'sign up stores the session', u && u.email);
+      ok(!m2.classList.contains('is-open'), 'modal closes after sign up');
+      res();
+    }, 150); });
+  }
+
+  /* ---------- END-TO-END: shop -> cart -> checkout -> confirmation ---------- */
+  if (page === 'place-order') {
+    var m0 = d.querySelector('[data-checkout]');
+    ok(!!m0, 'checkout form rendered');
+    var f = d.querySelector('[data-checkout]');
+    /* Nothing is pre-selected in the payment list, so the scenario has to
+       choose one the way a shopper would or validation refuses the submit. */
+    var pay = f.querySelector('input[name="payment"][value="card"]');
+    pay.checked = true; pay.dispatchEvent(new w.Event('change', { bubbles:true }));
+    ['fullname','email','phone','address','city','postcode','cardname','cardnumber','cardexp','cardcvc']
+      .forEach(function(n){
+        var el = f.querySelector('[name="'+n+'"]');
+        if (!el) return;
+        el.value = { fullname:'Amara Setiawan', email:'amara@example.com', phone:'08123456789',
+                     address:'Jl Merdeka 1', city:'Bandung', postcode:'40115',
+                     cardname:'A SETIAWAN', cardnumber:'4242424242424242',
+                     cardexp:'12/29', cardcvc:'123' }[n];
+        el.dispatchEvent(new w.Event('input', { bubbles:true }));
+      });
+    f.dispatchEvent(new w.Event('submit', { bubbles:true, cancelable:true }));
+    return new Promise(function(res){
+      setTimeout(function(){
+        /* The order redirects the iframe, so `d` is a detached document by
+           now. Re-acquire it before asserting against the confirmation. */
+        d = w.document;
+        ok(/confirmation\.html/.test(w.location.pathname), 'valid submit navigates to confirmation',
+           w.location.pathname.split('/').pop());
+        var stored = JSON.parse(localStorage.getItem('cw_last_order') || 'null');
+        ok(!!stored && /^CW-\d{4}-\d{5}$/.test(stored.number), 'order persisted with a number',
+           stored && stored.number);
+        ok(stored && stored.items.length === 2, 'order snapshot captured the 2 cart lines',
+           stored && stored.items.length);
+        ok(stored && stored.phone === '+62 8123456789',
+           'order stored the phone as +62 with the national number',
+           stored && stored.phone);
+        ok(stored && stored.paymentDetail && stored.paymentDetail.cardType === 'Visa',
+           'order recorded the chosen card network',
+           stored && stored.paymentDetail && stored.paymentDetail.cardType);
+        /* no card data may be persisted */
+        var dump = JSON.stringify(stored || {});
+        ok(dump.indexOf('4242424242424242') === -1, 'card number never persisted');
+        ok(dump.indexOf('123') === -1 || stored.paymentDetail.cardType === 'Visa',
+           'security code never persisted');
+        ok(stored && stored.totals && /^Rp\s/.test(stored.totals.total.toString()) === false,
+           'stored totals are numeric, not pre-formatted');
+        ok(stored && typeof stored.totals.total === 'number',
+           'totals stored as numbers so money() formats them at render time',
+           stored && typeof stored.totals.total);
+        ok(stored && stored.totals.total === stored.totals.subtotal + stored.totals.shipping + stored.totals.tax,
+           'stored total = subtotal + shipping + tax',
+           stored && JSON.stringify(stored.totals));
+        var confirmTxt = (d.querySelector('.confirm')||{textContent:''}).textContent;
+        ok(!/\$/.test(confirmTxt), 'confirmation shows no $ amounts',
+           (confirmTxt.match(/\$[0-9][^\s]*/g)||[]).join(' '));
+        var paid = '';
+        [].forEach.call(d.querySelectorAll('.confirm__meta > div'), function(row){
+          var lab = (row.querySelector('.confirm__meta-label')||{}).textContent || '';
+          if (/total paid/i.test(lab)) paid = (row.querySelector('.confirm__meta-value')||{}).textContent || '';
+        });
+        ok(/^Rp\s/.test(paid), 'confirmation renders a Rupiah total', paid);
+        var confRows = [].map.call(d.querySelectorAll('.confirm__meta-value'), function(e){return e.textContent;});
+        ok(confRows.some(function(t){return /Standard Delivery/i.test(t);}),
+           'confirmation names the delivery speed', confRows.join(' | '));
+        ok(d.querySelectorAll('.confirm__item').length === 2, 'both items listed on confirmation',
+           d.querySelectorAll('.confirm__item').length);
+        var cart = JSON.parse(localStorage.getItem('cw_cart') || '[]');
+        ok(cart.length === 0, 'cart emptied after checkout', cart.length + ' left');
+        res();
+      }, 900);
+    });
+  }
+
+  /* ---------- empty cart / empty wishlist guards ---------- */
+  if (page === 'cart-empty-check') {
+    ok(!!d.querySelector('[data-cart-empty]') && !d.querySelector('[data-cart-empty]').hidden,
+       'empty cart state shown');
+    ok(d.querySelector('[data-cart-filled]').hidden, 'cart summary hidden when empty');
+    ok(d.querySelectorAll('.line-item').length === 0, 'no stray cart lines');
+    ok(d.querySelector('[data-cart-count]').getAttribute('data-count') === '0',
+       'cart badge suppressed at zero');
+  }
+
+  /* ---------- BUG 1: a cart carrying a stale product id -------------------
+     Seeded from an older build, so the second line's id is not in the
+     catalogue. It must not reach the badge, the summary or the subtotal. */
+  if (page === 'cart-stale-check') {
+    var b = d.querySelector('[data-cart-count]');
+    ok(b.textContent === '1', 'stale line is not counted in the badge', b.textContent);
+    ok(d.querySelectorAll('.line-item').length === 1, 'stale line is not rendered',
+       d.querySelectorAll('.line-item').length);
+    var srows = [].map.call(d.querySelectorAll('.summary__row'), function(r){
+      return [].map.call(r.children, function(c){return c.textContent;}).join('|');
+    });
+    var sItems = (srows.filter(function(r){return r.indexOf('Items|')===0;})[0]||'').split('|')[1];
+    ok(sItems === '1', 'summary Items is 1, matching the badge', sItems);
+    var sSub = (srows.filter(function(r){return r.indexOf('Subtotal|')===0;})[0]||'').split('|')[1];
+    ok(sSub === 'Rp\u00a0385.000', 'subtotal prices only the resolvable line', sSub);
+  }
+
+  /* ---------- currency: no USD survives on any rendered page ------------- */
+  if (page === 'index.html' || page === 'shop.html' || page === 'product.html' ||
+      page === 'collections.html' || page === 'about.html' || page === 'promotion.html') {
+    var bodyTxt = d.querySelector('main').textContent + ' ' +
+                  (d.querySelector('.announce') ? d.querySelector('.announce').textContent : '');
+    ok(!/\$[0-9]/.test(bodyTxt), page + ' shows no $ amounts');
+    var announce = d.querySelector('.announce');
+    ok(announce && announce.textContent.indexOf('Free shipping on orders over Rp 1.500.000') > -1,
+       page + ' announcement bar reads Free shipping on orders over Rp 1.500.000',
+       announce && announce.textContent.trim());
+  }
+
+  if (page === 'product.html') {
+    var now = d.querySelector('.price__now');
+    ok(now && /^Rp\s/.test(now.textContent), 'product price rendered in Rupiah',
+       now && now.textContent);
+  }
+
+  /* ---------- mobile drawer ---------- */
+  if (page === 'drawer-check') {
+    var tg = d.querySelector('.nav-toggle');
+    ok(!!tg, 'mobile toggle exists');
+    tg.click();
+    ok(d.querySelector('.nav-drawer').classList.contains('is-open'), 'drawer opens');
+    ok(tg.getAttribute('aria-expanded') === 'true', 'aria-expanded true');
+    ok(d.querySelector('.nav-drawer__panel').querySelectorAll('a').length >= 7, 'drawer has links');
+    d.dispatchEvent(new w.KeyboardEvent('keydown', {key:'Escape', bubbles:true}));
+    ok(!d.querySelector('.nav-drawer').classList.contains('is-open'), 'Escape closes the drawer');
+  }
+
+  /* ---------- no horizontal overflow ---------- */
+  var vw = d.documentElement.clientWidth;
+  ok(d.documentElement.scrollWidth <= vw + 1, 'no horizontal page overflow',
+     'scrollW=' + d.documentElement.scrollWidth + ' clientW=' + vw);
+}
+
+function finish() {
+  lines.unshift('PASS: ' + PASS + '   FAIL: ' + FAIL);
+  lines.unshift('######## RUNTIME TEST ########');
+  var el = document.getElementById('r');
+  el.innerHTML = lines.join('\n').replace(/\n/g,'<br>');
+  el.innerHTML = el.innerHTML
+    .replace(/  ok  /g,'<span class="ok">  ok  </span>')
+    .replace(/  FAIL/g,'<span class="bad">  FAIL</span>')
+    .replace(/^===/gm,'<span class="hd">===</span>');
+  document.title = 'DONE';
+}
+
+var params = new URLSearchParams(location.search);
+var kind = params.get('seed') || '';
+var page = params.get('page');
+if (kind) seed(kind);
+
+var f = document.getElementById('f');
+/* this harness lives in tests/, so every iframe target sits one level up */
+var TARGET = {
+  'login-check': 'index.html',
+  'signup-check': 'index.html',
+  'drawer-check': 'index.html',
+  'place-order': 'checkout.html',
+  'cart-empty-check': 'cart.html',
+  'cart-stale-check': 'cart.html'
+};
+f.src = '../' + (TARGET[page] || page);
+
+/* The end-to-end scenario navigates the iframe to confirmation.html, which
+   fires a second load. Without this guard run() would start a second time
+   against a page it was not written for and the two runs would interleave
+   their assertions. */
+var started = false;
+f.addEventListener('load', function(){
+  if (started) return;
+  started = true;
+  setTimeout(function(){
+    try {
+      var p = run(kind, page);
+      if (p && p.then) { p.then(finish).catch(function(e){ lines.push('  FAIL harness error: ' + e.message); finish(); }); }
+      else finish();
+    } catch (e) {
+      lines.push('  FAIL harness threw: ' + e.message);
+      finish();
+    }
+  }, 350);
+});
+</script>
+</body></html>

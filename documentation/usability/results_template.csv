@@ -1,0 +1,160 @@
+# =============================================================================
+# USABILITY TEST RESULTS TEMPLATE
+# CHRISTIAN WIJAYA Luxury Fashion - CW / PREMIUM
+# =============================================================================
+# STATUS: EMPTY TEMPLATE.
+# No usability session has been conducted yet. Every value cell below is
+# intentionally blank. Fill them ONLY from a session that actually happened.
+# The example row shown in Section 5 demonstrates the FORMAT only.
+#
+# HOW TO USE THIS FILE
+#   Section 1 (raw task data)  and  Section 3 (raw questionnaire data)
+#       -> these are the INPUT. Transcribe them from observation_sheet.md and
+#          post_test_questionnaire.md.
+#   Section 2, 4 and 5 are DERIVED. Compute them from Sections 1 and 3 using
+#       the formulas below, or with live spreadsheet formulas.
+#   Do not fill any derived figure until the raw sections are complete.
+#
+# SPREADSHEET NOTE
+#   Some spreadsheet applications import the "#" comment lines above as
+#   ordinary rows. If that happens, delete rows 1-52 after import - the data
+#   begins at the line "# SECTION 1".
+#
+# -----------------------------------------------------------------------------
+# CALCULATION FORMULAS
+# -----------------------------------------------------------------------------
+# n_participants         = count of DISTINCT participant_id for that task_id
+#                           in Section 1
+# success_count          = COUNTIFS(task_id, T, outcome, "Success")
+# partial_count          = COUNTIFS(task_id, T, outcome, "Partial")
+# failed_count           = COUNTIFS(task_id, T, outcome, "Failed")
+# success_rate_pct       = success_count / n_participants * 100
+#                           Round to 1 decimal place.
+#                           Report Partial separately. Do NOT fold Partial
+#                           into Success, and do NOT drop Failed from the
+#                           denominator - the denominator is every participant
+#                           who attempted the task.
+# avg_completion_time_s   = AVERAGE(completion_time_seconds) across ALL
+#                           outcomes of that task_id.
+#                           If one time is far from the rest, also report the
+#                           MEDIAN, which is less sensitive to one outlier.
+#                           For Partial and Failed, the recorded time is the
+#                           time at which the participant stopped or was
+#                           stopped - it is a time-to-abandon, not a time-to-
+#                           complete, and must be labelled as such.
+# total_errors           = SUM(error_count) for that task_id
+# avg_errors_per_person  = total_errors / n_participants
+# total_assistance       = count of rows for that task_id where
+#                           assistance_level is "Hint", "Instruction" or
+#                           "Assist"  (levels 2, 3 and 4).
+#                           "None" and "Prompt" (levels 0 and 1) do NOT
+#                           count as assistance.
+# assistance_rate_pct    = total_assistance / n_participants * 100
+# study_success_rate_pct = (sum of success_count across all 8 tasks) /
+#                           (n_participants * 8) * 100
+# unassisted_success_pct = count of rows with outcome "Success" AND
+#                           assistance_level "None" / (n_participants * 8) * 100
+# questionnaire_mean     = AVERAGE of that item column across all participants
+# questionnaire_sd       = STDEV of that item column (sample SD)
+# overall_mean           = AVERAGE of the eight item means
+#                           REPORT THE EIGHT ITEM MEANS FIRST. The overall
+#                           mean must never appear on its own.
+#
+# -----------------------------------------------------------------------------
+# SAMPLE SIZE AND HOW TO REPORT
+# -----------------------------------------------------------------------------
+# With 5 participants, one person changes a task success rate by 20
+# percentage points and a questionnaire mean by up to 0.2. Treat single
+# differences as a signal worth investigating, not as a measured effect.
+# Always print n alongside every percentage. Never report a bare average.
+#
+# -----------------------------------------------------------------------------
+# WHAT THIS FILE IS NOT
+# -----------------------------------------------------------------------------
+# This file records HUMAN USABILITY EVALUATION. It is a different kind of
+# evidence from documentation/QA_REPORT.md, which records automated
+# verification of system behaviour. Automated QA does not substitute for
+# this study, and this study does not substitute for automated QA.
+# =============================================================================
+#
+# SECTION 1 - RAW TASK OBSERVATIONS (INPUT - one row per participant per task)
+task_id,task_name,participant_id,outcome,completion_time_seconds,error_count,assistance_level,errors_observed,participant_comments,observer_notes
+T1,Find a specific product,P01,,,,,,,
+T1,Find a specific product,P02,,,,,,,
+T1,Find a specific product,P03,,,,,,,
+T1,Find a specific product,P04,,,,,,,
+T1,Find a specific product,P05,,,,,,,
+T2,Filter the catalogue,P01,,,,,,,
+T2,Filter the catalogue,P02,,,,,,,
+T2,Filter the catalogue,P03,,,,,,,
+T2,Filter the catalogue,P04,,,,,,,
+T2,Filter the catalogue,P05,,,,,,,
+T3,Open a product detail page,P01,,,,,,,
+T3,Open a product detail page,P02,,,,,,,
+T3,Open a product detail page,P03,,,,,,,
+T3,Open a product detail page,P04,,,,,,,
+T3,Open a product detail page,P05,,,,,,,
+T4,Select size and colour and add to cart,P01,,,,,,,
+T4,Select size and colour and add to cart,P02,,,,,,,
+T4,Select size and colour and add to cart,P03,,,,,,,
+T4,Select size and colour and add to cart,P04,,,,,,,
+T4,Select size and colour and add to cart,P05,,,,,,,
+T5,Change quantity in cart,P01,,,,,,,
+T5,Change quantity in cart,P02,,,,,,,
+T5,Change quantity in cart,P03,,,,,,,
+T5,Change quantity in cart,P04,,,,,,,
+T5,Change quantity in cart,P05,,,,,,,
+T6,Complete contact and delivery information,P01,,,,,,,
+T6,Complete contact and delivery information,P02,,,,,,,
+T6,Complete contact and delivery information,P03,,,,,,,
+T6,Complete contact and delivery information,P04,,,,,,,
+T6,Complete contact and delivery information,P05,,,,,,,
+T7,Select a payment method,P01,,,,,,,
+T7,Select a payment method,P02,,,,,,,
+T7,Select a payment method,P03,,,,,,,
+T7,Select a payment method,P04,,,,,,,
+T7,Select a payment method,P05,,,,,,,
+T8,Place order and read confirmation,P01,,,,,,,
+T8,Place order and read confirmation,P02,,,,,,,
+T8,Place order and read confirmation,P03,,,,,,,
+T8,Place order and read confirmation,P04,,,,,,,
+T8,Place order and read confirmation,P05,,,,,,,
+#
+# SECTION 2 - TASK AGGREGATES (DERIVED - compute from Section 1)
+task_id,task_name,n_participants,success_count,partial_count,failed_count,success_rate_pct,avg_completion_time_s,median_completion_time_s,total_errors,avg_errors_per_person,total_assistance,assistance_rate_pct,qualitative_notes
+T1,Find a specific product,,,,,,,,,,,,,
+T2,Filter the catalogue,,,,,,,,,,,,,
+T3,Open a product detail page,,,,,,,,,,,,,
+T4,Select size and colour and add to cart,,,,,,,,,,,,,
+T5,Change quantity in cart,,,,,,,,,,,,,
+T6,Complete contact and delivery information,,,,,,,,,,,,,
+T7,Select a payment method,,,,,,,,,,,,,
+T8,Place order and read confirmation,,,,,,,,,,,,,
+STUDY,All tasks combined,,,,,,,,,,,,,
+#
+# SECTION 3 - RAW QUESTIONNAIRE RESPONSES (INPUT - one row per participant)
+# Q09-Q11 are free text; quote verbatim and keep participant IDs.
+participant_id,q01_navigation,q02_product_info,q03_search_filter,q04_cart,q05_checkout,q06_payment,q07_visual,q08_satisfaction,q09_easiest,q10_difficult,q11_improve
+P01,,,,,,,,,,,
+P02,,,,,,,,,,,
+P03,,,,,,,,,,,
+P04,,,,,,,,,,,
+P05,,,,,,,,,,,
+#
+# SECTION 4 - QUESTIONNAIRE AGGREGATES (DERIVED - compute from Section 3)
+item_id,item_text,scale,n_responses,mean_score,sd,responses_1,responses_2,responses_3,responses_4,responses_5,notes
+Q01,Ease of navigation,1-5,,,,,,,,,
+Q02,Product information clarity,1-5,,,,,,,,,
+Q03,Search and filtering usability,1-5,,,,,,,,,
+Q04,Cart usability,1-5,,,,,,,,,
+Q05,Checkout usability,1-5,,,,,,,,,
+Q06,Payment method clarity,1-5,,,,,,,,,
+Q07,Visual consistency,1-5,,,,,,,,,
+Q08,Overall satisfaction,1-5,,,,,,,,,
+ALL,Mean of the eight item means,1-5,,,,,,,,,
+#
+# SECTION 5 - QUALITATIVE OBSERVATIONS (DERIVED - themes from the notes and Q09-Q11)
+# Group related observations into themes. The row below shows the FORMAT only
+# and contains no real finding.
+theme_id,theme,participant_ids,related_task_id,evidence_quote,implication_for_design,severity,action
+EXAMPLE,"Theme name",P01,P6,"Verbatim quote from the participant.","What this suggests about the design.","high | medium | low","Concrete change to make"

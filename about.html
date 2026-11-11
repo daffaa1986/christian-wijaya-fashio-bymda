@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About - CHRISTIAN WIJAYA</title>
+  <meta name="description" content="Our story, philosophy and commitment to craftsmanship.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <p class="announce"><span class="announce__inner">Free shipping on orders over Rp 1.500.000 &nbsp;&middot;&nbsp; 30-day returns collected from your door</span></p>
+
+  <header class="site-header">
+    <div class="container">
+      <nav class="navbar" aria-label="Primary">
+        <a class="logo" href="index.html" aria-label="CHRISTIAN WIJAYA, home">
+          <span class="logo__name">CHRISTIAN WIJAYA</span>
+          <span class="logo__sub">Luxury Fashion</span>
+        </a>
+
+        <div class="nav-primary">
+          <ul class="nav-primary__list">
+            <li><a class="nav-primary__link" href="index.html">Home</a></li>
+            <li><a class="nav-primary__link" href="shop.html">Shop</a></li>
+            <li><a class="nav-primary__link" href="collections.html">Collections</a></li>
+            <li><a class="nav-primary__link" href="promotion.html">Promotion</a></li>
+            <li><a class="nav-primary__link" href="about.html" aria-current="page">About</a></li>
+          </ul>
+        </div>
+
+        <div class="nav-utils">
+          <form class="nav-search" role="search">
+            <label class="visually-hidden" for="nav-search">Search products</label>
+            <input class="nav-search__input" id="nav-search" type="search" name="q" placeholder="Search" autocomplete="off">
+          </form>
+          <button type="button" class="icon-btn" data-search-toggle aria-expanded="false" aria-controls="nav-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+            <span class="visually-hidden">Toggle search field</span>
+          </button>
+
+          <a class="icon-btn" href="wishlist.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 20s-7-4.4-7-9a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4.6-7 9-7 9z"/></svg>
+            <span class="icon-btn__label">Wishlist</span>
+            <span class="icon-btn__count" data-wish-count data-count="0"></span>
+            <span class="visually-hidden" data-wish-sr>wishlist items</span>
+          </a>
+
+          <a class="icon-btn" href="cart.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+            <span class="icon-btn__label">Cart</span>
+            <span class="icon-btn__count" data-cart-count data-count="0"></span>
+            <span class="visually-hidden" data-cart-sr>items in cart</span>
+          </a>
+
+          <button type="button" class="icon-btn" data-auth-action="login" data-auth-open="login">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>
+            <span class="icon-btn__label" data-auth-label>Login</span>
+            <span class="visually-hidden">account</span>
+          </button>
+
+          <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="nav-drawer">
+            <span class="nav-toggle__bars" aria-hidden="true"><span></span><span></span><span></span></span>
+            <span class="visually-hidden">Menu</span>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="nav-drawer" id="nav-drawer">
+    <div class="nav-drawer__scrim" aria-hidden="true"></div>
+    <div class="nav-drawer__panel" role="dialog" aria-modal="true" aria-label="Menu">
+      <div class="nav-drawer__head">
+        <span class="logo__name">CHRISTIAN WIJAYA</span>
+        <button type="button" class="nav-drawer__close">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          <span class="visually-hidden">Close menu</span>
+        </button>
+      </div>
+      <ul class="nav-drawer__list">
+        <li><a class="nav-drawer__link" href="index.html">Home</a></li>
+        <li><a class="nav-drawer__link" href="shop.html">Shop</a></li>
+        <li><a class="nav-drawer__link" href="collections.html">Collections</a></li>
+        <li><a class="nav-drawer__link" href="promotion.html">Promotion</a></li>
+        <li><a class="nav-drawer__link" href="about.html" aria-current="page">About</a></li>
+      </ul>
+      <div class="nav-drawer__utils">
+        <a class="btn btn--full" href="cart.html">Cart</a>
+        <a class="btn btn--ghost btn--full" href="wishlist.html">Wishlist</a>
+        <button type="button" class="btn btn--ghost btn--full" data-auth-open="login" data-auth-action="login">Login</button>
+      </div>
+    </div>
+  </div>
+
+  <main id="main">
+
+    <section class="section">
+      <div class="container">
+        <p class="eyebrow">Our story</p>
+        <h1 class="sec-title">A house built around one pair of hands</h1>
+        <p class="about-lede">CHRISTIAN WIJAYA began in 2016 with a single cutting table in Bandung and one rule that has not changed since: make fewer things, and make them properly.</p>
+      </div>
+    </section>
+
+    <section class="section section--beige" aria-labelledby="story-title">
+      <div class="container split">
+        <div class="split__media">
+          <img src="img/opt/alexander-naglestad-RFhq0SrrgEg-unsplash--1200.jpg"
+               alt="Tailored suits on mannequins inside the CHRISTIAN WIJAYA atelier" loading="lazy" width="1200" height="800">
+        </div>
+        <div class="split__body">
+          <p class="eyebrow">How it began</p>
+          <h2 class="sec-title" id="story-title">One jacket, forty-one hours</h2>
+          <div class="about-body">
+            <p>The first jacket took forty-one hours and cost more than the founder expected. It was padded by hand, the lapel rolled with a hot iron, and the pocket bag stitched at a tension the machine could not hold. It is still on the wall of the atelier.</p>
+            <p>That jacket set the standard. We have never moved faster, and we have never made more than we can finish properly. Today the house runs on one line, CW / PREMIUM &mdash; sixteen pieces, released in a single season.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="phil-title">
+      <div class="container">
+        <div class="sec-head">
+          <div class="sec-head__text">
+            <p class="eyebrow">Philosophy</p>
+            <h2 class="sec-title" id="phil-title">Three principles we do not negotiate</h2>
+          </div>
+        </div>
+        <div class="principle-grid">
+          <div class="principle">
+            <span class="principle__num" aria-hidden="true">01</span>
+            <h3>Traceable materials</h3>
+            <p>Super 120s wool from a named mill, vegetable-tanned leather, 18K gold vermeil. If we cannot name the source, we do not use it.</p>
+          </div>
+          <div class="principle">
+            <span class="principle__num" aria-hidden="true">02</span>
+            <h3>Made to be kept</h3>
+            <p>Every jacket carries a lifetime repair promise, and every pair of shoes can be resoled. We design for the second and third owner, not the first.</p>
+          </div>
+          <div class="principle">
+            <span class="principle__num" aria-hidden="true">03</span>
+            <h3>A fixed price</h3>
+            <p>We do not hold sales cycles to create urgency. A price is a price for the whole year, and reductions only happen when a season genuinely ends.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--ink" id="craft" aria-labelledby="craft2-title">
+      <div class="container craft-band">
+        <div class="craft-band__media">
+          <img src="img/opt/glassesshop-u3o3O67mrJo-unsplash--1200.jpg"
+               alt="Model wearing an oversized ivory wool coat with sunglasses" loading="lazy" width="1200" height="1800">
+        </div>
+        <div>
+          <p class="eyebrow">Quality &amp; craftsmanship</p>
+          <h2 class="sec-title" id="craft2-title">What the label does not tell you</h2>
+          <p class="sec-lede">A jacket is judged in four places the customer never sees: the shoulder, the lapel roll, the pocket bag tension, and the lining stitch. Ours are all done by hand, which is why they take most of the forty-one hours.</p>
+          <dl class="stat-grid spaced-top">
+            <div class="stat"><dt class="stat__label">Hand work</dt><dd class="stat__value">41 hrs</dd></div>
+            <div class="stat"><dt class="stat__label">Pieces</dt><dd class="stat__value">20</dd></div>
+            <div class="stat"><dt class="stat__label">Makers</dt><dd class="stat__value">9</dd></div>
+            <div class="stat"><dt class="stat__label">Repairs</dt><dd class="stat__value">Life</dd></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="stats-title">
+      <div class="container">
+        <div class="sec-head">
+          <div class="sec-head__text">
+            <p class="eyebrow">By the numbers</p>
+            <h2 class="sec-title" id="stats-title">The house at a glance</h2>
+          </div>
+        </div>
+        <dl class="stat-grid">
+          <div class="stat"><dt class="stat__label">Founded</dt><dd class="stat__value">2016</dd></div>
+          <div class="stat"><dt class="stat__label">Clients served</dt><dd class="stat__value">9,400</dd></div>
+          <div class="stat"><dt class="stat__label">Average rating</dt><dd class="stat__value">4.7</dd></div>
+          <div class="stat"><dt class="stat__label">Countries shipped</dt><dd class="stat__value">31</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="section section--beige" aria-labelledby="life-title">
+      <div class="container">
+        <div class="sec-head">
+          <div class="sec-head__text">
+            <p class="eyebrow">Lifestyle</p>
+            <h2 class="sec-title" id="life-title">Worn in motion</h2>
+            <p class="sec-lede">The collection is made to be lived in, so we photograph it that way.</p>
+          </div>
+        </div>
+        <div class="story-grid">
+          <figure class="story">
+            <img src="img/opt/marcus-lewis-wGuQH9JPcEY-unsplash--700.jpg" alt="Two figures in tailored outfits walking through a flower garden" loading="lazy" width="700" height="467">
+            <figcaption><h3>Spring in the garden</h3><p>Navy velvet and ivory cotton, photographed over one afternoon.</p></figcaption>
+          </figure>
+          <figure class="story">
+            <img src="img/opt/zhouxing-lu-1fdni7Dkfs8-unsplash--700.jpg" alt="Model in a white shirt and dark jacket with cropped trousers" loading="lazy" width="700" height="933">
+            <figcaption><h3>Cropped and clean</h3><p>How the pleated trouser is meant to break over the instep.</p></figcaption>
+          </figure>
+          <figure class="story">
+            <img src="img/opt/bruchin-noeka-N9G5GL9VewE-unsplash--700.jpg" alt="Model in a checked suit wearing brown leather derby shoes" loading="lazy" width="700" height="1050">
+            <figcaption><h3>Hand-stitched welt</h3><p>The detail that takes longest, and the one that shows most.</p></figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a class="logo" href="index.html">
+            <span class="logo__name">CHRISTIAN WIJAYA</span>
+            <span class="logo__sub">Luxury Fashion</span>
+          </a>
+          <p>Tailoring, leather and jewellery made in Bandung since 2016. Shipped worldwide.</p>
+        </div>
+
+        <div class="footer-col">
+          <h2 class="footer-col__title">The line</h2>
+          <ul>
+            <li><a href="shop.html?line=cw-premium">CW / PREMIUM</a></li>
+            <li><a href="shop.html?line=cw-premium&amp;category=men">Men</a></li>
+            <li><a href="shop.html?line=cw-premium&amp;category=women">Women</a></li>
+            <li><a href="shop.html?line=cw-premium&amp;category=shoes">Shoes</a></li>
+            <li><a href="shop.html?line=cw-premium&amp;category=accessories">Accessories</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h2 class="footer-col__title">The house</h2>
+          <ul>
+            <li><a href="about.html">Our story</a></li>
+            <li><a href="about.html#craft">Craftsmanship</a></li>
+            <li><a href="promotion.html">Promotion</a></li>
+            <li><a href="wishlist.html">Wishlist</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h2 class="footer-col__title">Client care</h2>
+          <ul>
+            <li><a href="cart.html">Cart</a></li>
+            <li><button type="button" data-auth-open="login">Account</button></li>
+            <li><a href="mailto:care@christianwijaya.example">care@christianwijaya.example</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; <span data-year>2026</span> Christian Wijaya. All rights reserved.</p>
+        <div class="footer-bottom__links">
+          <a href="about.html">Privacy</a>
+          <a href="about.html">Terms</a>
+          <a href="about.html">Accessibility</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div class="modal" id="auth-modal" role="dialog" aria-modal="true" aria-label="Account">
+    <div class="modal__scrim"></div>
+    <div class="modal__panel">
+      <button type="button" class="modal__close" data-auth-close>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        <span class="visually-hidden">Close</span>
+      </button>
+
+      <div class="tabs" role="tablist" aria-label="Account">
+        <button class="tab" type="button" role="tab" id="tab-login" data-tab="login"
+                aria-selected="true" aria-controls="panel-login">Log in</button>
+        <button class="tab" type="button" role="tab" id="tab-signup" data-tab="signup"
+                aria-selected="false" aria-controls="panel-signup">Sign up</button>
+      </div>
+
+      <div class="notice" data-auth-message hidden></div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-login" data-panel="login" aria-labelledby="tab-login">
+        <h2 class="modal__title">Welcome back</h2>
+        <p class="modal__lede">Sign in to view your orders and saved pieces.</p>
+
+        <form id="login-form" novalidate>
+          <div class="field">
+            <label class="field__label" for="login-email">Email <span class="req" aria-hidden="true">*</span></label>
+            <input class="field__input" id="login-email" name="email" type="email"
+                   autocomplete="email" required aria-describedby="login-email-err">
+            <p class="field__error" id="login-email-err"></p>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="login-password">Password <span class="req" aria-hidden="true">*</span></label>
+            <input class="field__input" id="login-password" name="password" type="password"
+                   autocomplete="current-password" required aria-describedby="login-password-err">
+            <p class="field__error" id="login-password-err"></p>
+          </div>
+
+          <div class="field">
+            <label class="check">
+              <input type="checkbox" name="remember" checked>
+              <span>Remember me on this device</span>
+            </label>
+          </div>
+
+          <button class="btn btn--full btn--lg" type="submit">Log in</button>
+
+          <p class="center-note">
+            <button type="button" class="link" data-forgot>Forgot your password?</button>
+          </p>
+        </form>
+
+        <p class="modal__switch">
+          New to the house? <button type="button" data-tab-jump="signup">Create an account</button>
+        </p>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-signup" data-panel="signup" aria-labelledby="tab-signup" hidden>
+        <h2 class="modal__title">Create your account</h2>
+        <p class="modal__lede">One account for orders, saved pieces and early access.</p>
+
+        <form id="signup-form" novalidate>
+          <div class="field">
+            <label class="field__label" for="su-name">Full name <span class="req" aria-hidden="true">*</span></label>
+            <input class="field__input" id="su-name" name="fullname" type="text"
+                   autocomplete="name" required aria-describedby="su-name-err">
+            <p class="field__error" id="su-name-err"></p>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="su-email">Email <span class="req" aria-hidden="true">*</span></label>
+            <input class="field__input" id="su-email" name="email" type="email"
+                   autocomplete="email" required aria-describedby="su-email-err">
+            <p class="field__error" id="su-email-err"></p>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="su-pass">Password <span class="req" aria-hidden="true">*</span></label>
+            <input class="field__input" id="su-pass" name="password" type="password"
+                   autocomplete="new-password" required aria-describedby="su-pass-err">
+            <p class="field__error" id="su-pass-err"></p>
+            <p class="field__hint">At least 8 characters.</p>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="su-confirm">Confirm password <span class="req" aria-hidden="true">*</span></label>
+            <input class="field__input" id="su-confirm" name="confirm" type="password"
+                   autocomplete="new-password" required aria-describedby="su-confirm-err">
+            <p class="field__error" id="su-confirm-err"></p>
+          </div>
+
+          <div class="field">
+            <label class="check">
+              <input type="checkbox" name="terms" required>
+              <span>I agree to the <a href="about.html">terms of sale</a> and <a href="about.html">privacy policy</a>. <span class="req" aria-hidden="true">*</span></span>
+            </label>
+          </div>
+
+          <button class="btn btn--full btn--lg" type="submit">Create account</button>
+        </form>
+
+        <p class="modal__switch">
+          Already have an account? <button type="button" data-tab-jump="login">Log in</button>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

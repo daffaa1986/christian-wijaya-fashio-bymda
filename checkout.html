@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - CHRISTIAN WIJAYA</title>
+  <meta name="description" content="Enter your delivery and payment details to complete your order.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <p class="announce"><span class="announce__inner">Free shipping on orders over Rp 1.500.000 &nbsp;&middot;&nbsp; 30-day returns collected from your door</span></p>
+
+  <header class="site-header">
+    <div class="container">
+      <nav class="navbar" aria-label="Primary">
+        <a class="logo" href="index.html" aria-label="CHRISTIAN WIJAYA, home">
+          <span class="logo__name">CHRISTIAN WIJAYA</span>
+          <span class="logo__sub">Luxury Fashion</span>
+        </a>
+
+        <div class="nav-primary">
+          <ul class="nav-primary__list">
+            <li><a class="nav-primary__link" href="index.html">Home</a></li>
+            <li><a class="nav-primary__link" href="shop.html" aria-current="page">Shop</a></li>
+            <li><a class="nav-primary__link" href="collections.html">Collections</a></li>
+            <li><a class="nav-primary__link" href="promotion.html">Promotion</a></li>
+            <li><a class="nav-primary__link" href="about.html">About</a></li>
+          </ul>
+        </div>
+
+        <div class="nav-utils">
+          <form class="nav-search" role="search">
+            <label class="visually-hidden" for="nav-search">Search products</label>
+            <input class="nav-search__input" id="nav-search" type="search" name="q" placeholder="Search" autocomplete="off">
+          </form>
+          <button type="button" class="icon-btn" data-search-toggle aria-expanded="false" aria-controls="nav-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+            <span class="visually-hidden">Toggle search field</span>
+          </button>
+
+          <a class="icon-btn" href="wishlist.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 20s-7-4.4-7-9a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4.6-7 9-7 9z"/></svg>
+            <span class="icon-btn__label">Wishlist</span>
+            <span class="icon-btn__count" data-wish-count data-count="0"></span>
+            <span class="visually-hidden" data-wish-sr>wishlist items</span>
+          </a>
+
+          <a class="icon-btn" href="cart.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+            <span class="icon-btn__label">Cart</span>
+            <span class="icon-btn__count" data-cart-count data-count="0"></span>
+            <span class="visually-hidden" data-cart-sr>items in cart</span>
+          </a>
+
+          <button type="button" class="icon-btn" data-auth-action="login" data-auth-open="login">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>
+            <span class="icon-btn__label" data-auth-label>Login</span>
+            <span class="visually-hidden">account</span>
+          </button>
+
+          <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="nav-drawer">
+            <span class="nav-toggle__bars" aria-hidden="true"><span></span><span></span><span></span></span>
+            <span class="visually-hidden">Menu</span>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="nav-drawer" id="nav-drawer">
+    <div class="nav-drawer__scrim" aria-hidden="true"></div>
+    <div class="nav-drawer__panel" role="dialog" aria-modal="true" aria-label="Menu">
+      <div class="nav-drawer__head">
+        <span class="logo__name">CHRISTIAN WIJAYA</span>
+        <button type="button" class="nav-drawer__close">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          <span class="visually-hidden">Close menu</span>
+        </button>
+      </div>
+      <ul class="nav-drawer__list">
+        <li><a class="nav-drawer__link" href="index.html">Home</a></li>
+        <li><a class="nav-drawer__link" href="shop.html" aria-current="page">Shop</a></li>
+        <li><a class="nav-drawer__link" href="collections.html">Collections</a></li>
+        <li><a class="nav-drawer__link" href="promotion.html">Promotion</a></li>
+        <li><a class="nav-drawer__link" href="about.html">About</a></li>
+      </ul>
+      <div class="nav-drawer__utils">
+        <a class="btn btn--full" href="cart.html">Cart</a>
+        <a class="btn btn--ghost btn--full" href="wishlist.html">Wishlist</a>
+        <button type="button" class="btn btn--ghost btn--full" data-auth-open="login" data-auth-action="login">Login</button>
+      </div>
+    </div>
+  </div>
+
+  <main id="main">
+
+    <section class="container page-head">
+      <p class="eyebrow">Checkout</p>
+      <h1 class="page-head__title">Delivery &amp; payment</h1>
+    </section>
+
+    <section class="container page-body">
+
+      <div class="empty-state" data-checkout-guard hidden>
+        <span class="empty-state__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M9 13h6"/></svg></span>
+        <h2>There is nothing to check out</h2>
+        <p>Your cart is empty. Add a piece first, then return here to complete your order.</p>
+        <a class="btn btn--lg" href="shop.html">Shop the collection</a>
+      </div>
+
+<div data-checkout-main>
+        <ol class="steps" aria-label="Checkout progress">
+          <li class="steps__item"><span class="steps__num" aria-hidden="true">1</span> Cart</li>
+          <li class="steps__item is-active"><span class="steps__num" aria-hidden="true">2</span> Details</li>
+          <li class="steps__item"><span class="steps__num" aria-hidden="true">3</span> Confirmation</li>
+        </ol>
+
+        <form class="checkout-layout" data-checkout novalidate>
+          <div>
+            <fieldset class="checkout-section">
+              <legend class="checkout-section__title">1. Contact information</legend>
+
+              <div class="field">
+                <label class="field__label" for="co-name">Full name <span class="req" aria-hidden="true">*</span></label>
+                <input class="field__input" id="co-name" name="fullname" type="text" autocomplete="name" required aria-describedby="co-name-err">
+                <p class="field__error" id="co-name-err"></p>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="co-email">Email <span class="req" aria-hidden="true">*</span></label>
+                <input class="field__input" id="co-email" name="email" type="email" autocomplete="email" required aria-describedby="co-email-err">
+                <p class="field__error" id="co-email-err"></p>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="co-country">Country or region <span class="req" aria-hidden="true">*</span></label>
+                <select class="field__select" id="co-country" name="country" autocomplete="country" data-country></select>
+                <p class="field__hint">Sets the country code for your phone number and the payment methods we can offer.</p>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="co-phone">Phone <span class="req" aria-hidden="true">*</span></label>
+                <div class="phone-row">
+                  <span class="phone-row__dial" aria-hidden="true" data-dial>+62</span>
+                  <input class="field__input" id="co-phone" name="phone" type="tel" inputmode="tel"
+                         autocomplete="tel-national" placeholder="8123456789" required
+                         aria-describedby="co-phone-err co-phone-hint">
+                </div>
+                <p class="field__error" id="co-phone-err"></p>
+                <p class="field__hint" id="co-phone-hint" data-phone-display>Enter the Indonesia number only.</p>
+              </div>
+            </fieldset>
+
+            <fieldset class="checkout-section">
+              <legend class="checkout-section__title">2. Shipping address</legend>
+
+              <div class="field">
+                <label class="field__label" for="co-address">Street address <span class="req" aria-hidden="true">*</span></label>
+                <input class="field__input" id="co-address" name="address" type="text" autocomplete="street-address" required aria-describedby="co-address-err">
+                <p class="field__error" id="co-address-err"></p>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label class="field__label" for="co-city">City <span class="req" aria-hidden="true">*</span></label>
+                  <input class="field__input" id="co-city" name="city" type="text" autocomplete="address-level2" required aria-describedby="co-city-err">
+                  <p class="field__error" id="co-city-err"></p>
+                </div>
+                <div class="field">
+                  <label class="field__label" for="co-post">Postcode <span class="req" aria-hidden="true">*</span></label>
+                  <input class="field__input" id="co-post" name="postcode" type="text" autocomplete="postal-code" required aria-describedby="co-post-err">
+                  <p class="field__error" id="co-post-err"></p>
+                </div>
+              </div>
+
+              <p class="filter-group__title" id="speed-label">Delivery speed</p>
+              <!-- Delivery speeds are built from SHIPPING_METHODS in script.js, so the
+                   copy here always matches the figure the order total is using. -->
+              <div class="choice-group" role="radiogroup" aria-labelledby="speed-label" data-shipping-list></div>
+              <p class="notice notice--error" data-shipping-error hidden>Please choose a delivery speed.</p>
+            </fieldset>
+
+            <fieldset class="checkout-section">
+              <legend class="checkout-section__title">3. Payment method</legend>
+
+              <div class="choice-group" data-payment-list role="radiogroup" aria-label="Payment method"></div>
+              <p class="notice notice--error" data-payment-error hidden>Please select a payment method.</p>
+
+              <!-- ============ CREDIT / DEBIT CARD ============ -->
+              <div class="pay-panel" data-panel="card" hidden>
+                <fieldset class="optgroup">
+                  <legend class="optgroup__label" id="cardtype-label">Card type <span class="req" aria-hidden="true">*</span></legend>
+                  <div class="chip-group" data-card-types role="radiogroup" aria-labelledby="cardtype-label"></div>
+                  <p class="field__error" data-err="cardtype" hidden>Please choose a card type.</p>
+                </fieldset>
+
+                <div class="field">
+                  <label class="field__label" for="co-cardname">Cardholder name <span class="req" aria-hidden="true">*</span></label>
+                  <input class="field__input" id="co-cardname" name="cardname" type="text" autocomplete="cc-name" aria-describedby="co-cardname-err">
+                  <p class="field__error" id="co-cardname-err"></p>
+                </div>
+
+                <div class="field">
+                  <label class="field__label" for="co-cardnum">Card number <span class="req" aria-hidden="true">*</span></label>
+                  <input class="field__input" id="co-cardnum" name="cardnumber" type="text" inputmode="numeric" autocomplete="cc-number" placeholder="4242 4242 4242 4242" maxlength="23" aria-describedby="co-cardnum-err">
+                  <p class="field__error" id="co-cardnum-err"></p>
+                  <p class="field__hint">Prototype only &mdash; no card data is stored or transmitted.</p>
+                </div>
+
+                <div class="field-row">
+                  <div class="field">
+                    <label class="field__label" for="co-exp">Expiry <span class="req" aria-hidden="true">*</span></label>
+                    <input class="field__input" id="co-exp" name="cardexp" type="text" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY" maxlength="5" aria-describedby="co-exp-err">
+                    <p class="field__error" id="co-exp-err"></p>
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="co-cvc">Security code <span class="req" aria-hidden="true">*</span></label>
+                    <input class="field__input" id="co-cvc" name="cardcvc" type="text" inputmode="numeric" autocomplete="cc-csc" placeholder="123" maxlength="4" aria-describedby="co-cvc-err">
+                    <p class="field__error" id="co-cvc-err"></p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ============ BANK TRANSFER / VIRTUAL ACCOUNT ============ -->
+              <div class="pay-panel" data-panel="va" hidden>
+                <div class="field">
+                  <label class="visually-hidden" for="co-banksearch">Search banks</label>
+                  <input class="field__input" id="co-banksearch" type="search" placeholder="Search bank" autocomplete="off" data-bank-search>
+                </div>
+
+                <p class="filter-group__title" id="bank-label">Popular banks</p>
+                <div class="bank-grid" data-bank-list role="radiogroup" aria-labelledby="bank-label"></div>
+                <p class="field__hint" data-bank-empty hidden>No bank matches that search. Try another name.</p>
+
+                <p class="spaced-top">
+                  <button type="button" class="link-underline" data-bank-toggle aria-expanded="false" aria-controls="co-bank-all">View all banks</button>
+                </p>
+                <div class="bank-grid spaced-top" id="co-bank-all" data-bank-all hidden></div>
+
+                <p class="field__error" data-err="bank" hidden>Please select a bank.</p>
+
+                <div class="va-result" data-va-result hidden>
+                  <p class="eyebrow">Virtual account</p>
+                  <h3 class="va-result__bank" data-va-bank>Virtual account</h3>
+                  <dl class="spec-pair">
+                    <div class="spec-pair__row"><dt>Virtual account number</dt><dd data-va-number>&mdash;</dd></div>
+                    <div class="spec-pair__row"><dt>Amount to transfer</dt><dd data-va-amount>&mdash;</dd></div>
+                    <div class="spec-pair__row"><dt>Expires</dt><dd>24 hours after the order is placed</dd></div>
+                  </dl>
+                  <button type="button" class="btn btn--full" data-copy-va>Copy VA number</button>
+                  <p class="field__hint" data-copy-feedback role="status" aria-live="polite"></p>
+                  <p class="notice notice--error spaced-top">Demo payment flow &mdash; no real transaction is created and this account number is fictional.</p>
+                </div>
+              </div>
+
+              <!-- ============ QRIS ============ -->
+              <div class="pay-panel" data-panel="qris" hidden>
+                <p class="eyebrow">QRIS payment</p>
+                <div class="qr-demo">
+                  <div class="qr-demo__code" data-qr-demo aria-hidden="true"></div>
+                  <p class="qr-demo__label">Demo QR</p>
+                </div>
+                <p class="pay-amount" data-qr-amount>&mdash;</p>
+                <p class="pay-help">Scan using your preferred banking or e-wallet application.</p>
+                <button type="button" class="btn btn--full spaced-top" data-qris-done data-demo-continue="QRIS">I have completed payment</button>
+                <p class="field__hint">This QR is drawn for the prototype only. It is not a real QRIS code and cannot be scanned.</p>
+              </div>
+
+              <!-- ============ DIGITAL WALLET ============ -->
+              <div class="pay-panel" data-panel="wallet" hidden>
+                <p class="filter-group__title" id="wallet-label">Select a wallet <span class="req" aria-hidden="true">*</span></p>
+                <div class="wallet-grid" data-wallet-list role="radiogroup" aria-labelledby="wallet-label"></div>
+                <p class="field__error" data-err="wallet" hidden>Please select a wallet.</p>
+
+                <div class="pay-step" data-wallet-step hidden>
+                  <p class="pay-help" data-wallet-copy>Demo: you would be redirected to the selected wallet application.</p>
+                  <p class="pay-amount" data-wallet-amount>&mdash;</p>
+                  <button type="button" class="btn btn--full spaced-top" data-wallet-continue data-demo-continue="Digital wallet">Continue</button>
+                  <p class="field__hint">Prototype interaction only &mdash; nothing is sent to the wallet provider.</p>
+                </div>
+              </div>
+
+              <!-- ============ CASH ON DELIVERY ============ -->
+              <div class="pay-panel" data-panel="cod" hidden>
+                <div class="notice notice--success">
+                  <p><strong>Available in selected areas.</strong></p>
+                  <p>Available in Bandung and Jakarta. We confirm your address when the order is placed.</p>
+                </div>
+                <p class="pay-help">Pay the courier in cash when your order arrives. No card details are needed.</p>
+              </div>
+
+              <!-- ============ PAYPAL ============ -->
+              <div class="pay-panel" data-panel="paypal" hidden>
+                <p class="pay-help">Demo: you would be redirected to PayPal to approve this payment, then returned here.</p>
+                <p class="pay-amount" data-paypal-amount>&mdash;</p>
+                <button type="button" class="btn btn--full spaced-top" data-paypal-continue data-demo-continue="PayPal">Continue to PayPal</button>
+                <p class="field__hint">Prototype interaction only &mdash; no PayPal account is contacted.</p>
+              </div>
+            </fieldset>
+          </div>
+
+          <aside>
+            <div class="summary" data-checkout-summary aria-label="Order summary"></div>
+            <button class="btn btn--lg btn--full" type="submit" data-submit-order>Place order</button>
+            <p class="fine-print">
+              By placing this order you accept our <a class="link-underline" href="about.html">terms of sale</a>.
+            </p>
+            <p class="fine-print">
+              Prototype checkout. No payment is processed and no card details leave this page.
+            </p>
+          </aside>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a class="logo" href="index.html">
+            <span class="logo__name">CHRISTIAN WIJAYA</span>
+            <span class="logo__sub">Luxury Fashion</span>
+          </a>
+          <p>Tailoring, leather and jewellery made in Bandung since 2016. Shipped worldwide.</p>
+        </div>
+
+        <div class="footer-col">
+          <h2 class="footer-col__title">The line</h2>
+          <ul>
+            <li><a href="shop.html?line=cw-premium">CW / PREMIUM</a></li>
+            <li><a href="shop.html?line=cw-premium&amp;category=men">Men</a></li>
+            <li><a href="shop.html?line=cw-premium&amp;category=women">Women</a></li>
+            <li><a href="shop.html?line=cw-premium&amp;category=shoes">Shoes</a></li>
+            <li><a href="shop.html?line=cw-premium&amp;category=accessories">Accessories</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h2 class="footer-col__title">The house</h2>
+          <ul>
+            <li><a href="about.html">Our story</a></li>
+            <li><a href="about.html#craft">Craftsmanship</a></li>
+            <li><a href="promotion.html">Promotion</a></li>
+            <li><a href="wishlist.html">Wishlist</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h2 class="footer-col__title">Client care</h2>
+          <ul>
+            <li><a href="cart.html">Cart</a></li>
+            <li><button type="button" data-auth-open="login">Account</button></li>
+            <li><a href="mailto:care@christianwijaya.example">care@christianwijaya.example</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; <span data-year>2026</span> Christian Wijaya. All rights reserved.</p>
+        <div class="footer-bottom__links">
+          <a href="about.html">Privacy</a>
+          <a href="about.html">Terms</a>
+          <a href="about.html">Accessibility</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div class="modal" id="auth-modal" role="dialog" aria-modal="true" aria-label="Account">
+    <div class="modal__scrim"></div>
+    <div class="modal__panel">
+      <button type="button" class="modal__close" data-auth-close>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        <span class="visually-hidden">Close</span>
+      </button>
+
+      <div class="tabs" role="tablist" aria-label="Account">
+        <button class="tab" type="button" role="tab" id="tab-login" data-tab="login"
+                aria-selected="true" aria-controls="panel-login">Log in</button>
+        <button class="tab" type="button" role="tab" id="tab-signup" data-tab="signup"
+                aria-selected="false" aria-controls="panel-signup">Sign up</button>
+      </div>
+
+      <div class="notice" data-auth-message hidden></div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-login" data-panel="login" aria-labelledby="tab-login">
+        <h2 class="modal__title">Welcome back</h2>
+        <p class="modal__lede">Sign in to view your orders and saved pieces.</p>
+
+        <form id="login-form" novalidate>
+          <div class="field">
+            <label class="field__label" for="login-email">Email <span class="req" aria-hidden="true">*</span></label>
+            <input class="field__input" id="login-email" name="email" type="email"
+                   autocomplete="email" required aria-describedby="login-email-err">
+            <p class="field__error" id="login-email-err"></p>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="login-password">Password <span class="req" aria-hidden="true">*</span></label>
+            <input class="field__input" id="login-password" name="password" type="password"
+                   autocomplete="current-password" required aria-describedby="login-password-err">
+            <p class="field__error" id="login-password-err"></p>
+          </div>
+
+          <div class="field">
+            <label class="check">
+              <input type="checkbox" name="remember" checked>
+              <span>Remember me on this device</span>
+            </label>
+          </div>
+
+          <button class="btn btn--full btn--lg" type="submit">Log in</button>
+
+          <p class="center-note">
+            <button type="button" class="link" data-forgot>Forgot your password?</button>
+          </p>
+        </form>
+
+        <p class="modal__switch">
+          New to the house? <button type="button" data-tab-jump="signup">Create an account</button>
+        </p>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-signup" data-panel="signup" aria-labelledby="tab-signup" hidden>
+        <h2 class="modal__title">Create your account</h2>
+        <p class="modal__lede">One account for orders, saved pieces and early access.</p>
+
+        <form id="signup-form" novalidate>
+          <div class="field">
+            <label class="field__label" for="su-name">Full name <span class="req" aria-hidden="true">*</span></label>
+            <input class="field__input" id="su-name" name="fullname" type="text"
+                   autocomplete="name" required aria-describedby="su-name-err">
+            <p class="field__error" id="su-name-err"></p>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="su-email">Email <span class="req" aria-hidden="true">*</span></label>
+            <input class="field__input" id="su-email" name="email" type="email"
+                   autocomplete="email" required aria-describedby="su-email-err">
+            <p class="field__error" id="su-email-err"></p>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="su-pass">Password <span class="req" aria-hidden="true">*</span></label>
+            <input class="field__input" id="su-pass" name="password" type="password"
+                   autocomplete="new-password" required aria-describedby="su-pass-err">
+            <p class="field__error" id="su-pass-err"></p>
+            <p class="field__hint">At least 8 characters.</p>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="su-confirm">Confirm password <span class="req" aria-hidden="true">*</span></label>
+            <input class="field__input" id="su-confirm" name="confirm" type="password"
+                   autocomplete="new-password" required aria-describedby="su-confirm-err">
+            <p class="field__error" id="su-confirm-err"></p>
+          </div>
+
+          <div class="field">
+            <label class="check">
+              <input type="checkbox" name="terms" required>
+              <span>I agree to the <a href="about.html">terms of sale</a> and <a href="about.html">privacy policy</a>. <span class="req" aria-hidden="true">*</span></span>
+            </label>
+          </div>
+
+          <button class="btn btn--full btn--lg" type="submit">Create account</button>
+        </form>
+
+        <p class="modal__switch">
+          Already have an account? <button type="button" data-tab-jump="login">Log in</button>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

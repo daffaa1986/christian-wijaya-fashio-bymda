@@ -1,0 +1,165 @@
+# ============================================================================
+# CHRISTIAN WIJAYA - Luxury Fashion
+# .gitignore
+#
+# Rules here are deliberately EXPLICIT. This is a static HTML / CSS / vanilla
+# JavaScript project with no build step, no package manager and no
+# dependencies, so a broad ignore list would only risk hiding real project
+# files. Nothing below may match anything the running website needs.
+#
+# REMEMBER: ignoring a file excludes it from Git only. Nothing here deletes
+# or moves anything in the local working copy.
+# ============================================================================
+
+
+# ----------------------------------------------------------------------------
+# 1. PRESERVED LOCAL ARCHIVES - kept on disk, never published
+# ----------------------------------------------------------------------------
+# The original first-generation site files.
+backup_original/
+
+# A snapshot taken immediately before the Phase 3 QA fixes. Retained locally as
+# a rollback point; publishing it would show three apparent versions of the
+# stylesheet with no way to tell which is authoritative.
+backup_pre_phase3/
+
+# The original HCI coursework document. It contains author identity metadata
+# in its OOXML package (dc:creator / cp:lastModifiedBy) and an early mockup
+# that predates the current build. It stays in the local project; it is not
+# part of the published repository.
+HCI.docx
+
+# Empty placeholder created at project start.
+HCI FIGMA.txt
+
+
+# ----------------------------------------------------------------------------
+# 2. FULL-RESOLUTION SOURCE IMAGES - kept locally, not published
+# ----------------------------------------------------------------------------
+# The website serves responsive derivatives from img/opt/ only. The originals
+# in the img/ root are ~161 MB of editing source material that the running
+# site never requests. Publishing them would grow the repository roughly
+# thirteenfold for no functional gain.
+#
+# NOTE: img/opt/ is NOT ignored and must never be - the site loads from it.
+img/*.jpg
+img/*.jpeg
+img/*.png
+img/*.gif
+img/*.webp
+img/*.avif
+
+# Source working folder for the catalogue photography. Not referenced by any
+# page, script or stylesheet.
+img/buat foto fashion/
+
+# Six derivatives in img/opt/ that no product in the catalogue references.
+# Excluded so the published image set is exactly the set the site serves.
+img/opt/fashion luxury 1--240.jpg
+img/opt/fashion luxury 1--612.jpg
+img/opt/glassesshop-PFTjVsYUWzs-unsplash--1200.jpg
+img/opt/glassesshop-PFTjVsYUWzs-unsplash--1920.jpg
+img/opt/glassesshop-PFTjVsYUWzs-unsplash--240.jpg
+img/opt/glassesshop-PFTjVsYUWzs-unsplash--700.jpg
+
+
+# ----------------------------------------------------------------------------
+# 3. DUPLICATE QA REPORT
+# ----------------------------------------------------------------------------
+# documentation/QA_REPORT.md is the canonical copy referenced by README.md.
+# This root-level duplicate is byte-identical and is kept locally only, so the
+# published repository carries exactly one QA report.
+#
+# The leading slash is REQUIRED: without it this pattern would also match
+# documentation/QA_REPORT.md, which must be published.
+/QA_REPORT.md
+
+
+# ----------------------------------------------------------------------------
+# 4. LOCAL TOOLING AND TEST OUTPUT
+# ----------------------------------------------------------------------------
+# The behavioural and viewport QA suites were run from a scratch directory
+# outside the repository so that they add no dependency weight to it.
+scratch/
+qa3.mjs
+viewport.mjs
+qa3_out.txt
+vp_out.txt
+
+# Local recordings and working artefacts from usability testing sessions.
+documentation/usability/recordings/
+documentation/usability/*.local.md
+
+
+# ----------------------------------------------------------------------------
+# 5. OPERATING SYSTEM ARTIFACTS
+# ----------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+
+# ----------------------------------------------------------------------------
+# 6. EDITOR AND IDE ARTIFACTS
+# ----------------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+
+# ----------------------------------------------------------------------------
+# 7. LOGS AND TEMPORARY FILES
+# ----------------------------------------------------------------------------
+*.log
+npm-debug.log*
+yarn-error.log*
+.cache/
+.temp/
+tmp/
+*.tmp
+*.bak
+*.orig
+*.rej
+
+
+# ----------------------------------------------------------------------------
+# 8. SENSITIVE LOCAL FILES (defensive - none exist in this project today)
+# ----------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+secrets.json
+.netrc
+.npmrc
+id_rsa
+id_ed25519
+
+
+# ============================================================================
+# NOT IGNORED ON PURPOSE
+# ============================================================================
+# README.md                        the repository front page
+# index.html and the other 9 pages the site itself
+# style.css, script.js, favicon.ico the whole application
+# img/opt/                         every image the site actually loads
+# screenshots/                     portfolio evidence, with MANIFEST.md
+# documentation/QA_REPORT.md       the canonical QA report
+# documentation/HCI_Report_Outline.md
+# documentation/usability/         the usability testing instruments
+# documentation/legacy/            the mockup extracted from HCI.docx
+# tests/                           verify_selectors.py, _harness.html, _a11y.html
+# ============================================================================

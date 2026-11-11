@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>a11y audit</title>
+<style>html,body{margin:0;background:#111;color:#eee;font:12.5px/1.55 Consolas,monospace}
+#r{padding:14px;white-space:pre-wrap}
+.ok{color:#5f5}.bad{color:#f77}.warn{color:#fc6}.hd{color:#8cf;font-weight:bold}
+#f{width:1280px;height:900px;border:0;background:#fff}</style></head><body>
+<div id="r">running...</div>
+<iframe id="f" title="target"></iframe>
+<script>
+var PASS=0, FAIL=0, WARN=0, out=[];
+function say(c, label, extra, warnOnly){
+  if (c) { PASS++; out.push('  ok   '+label+(extra?'   ['+extra+']':'')); }
+  else if (warnOnly) { WARN++; out.push('  warn '+label+(extra?'   ['+extra+']':'')); }
+  else { FAIL++; out.push('  FAIL '+label+(extra?'   ['+extra+']':'')); }
+}
+function parseRGB(s){
+  var m = s.match(/rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?\)/);
+  if(!m) return null;
+  return { r:+m[1], g:+m[2], b:+m[3], a: m[4]!==undefined ? +m[4] : 1 };
+}
+function lum(c){
+  function f(v){ v/=255; return v<=0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4); }
+  return 0.2126*f(c.r)+0.7152*f(c.g)+0.0722*f(c.b);
+}
+function ratio(fg,bg){
+  var L1=lum(fg), L2=lum(bg);
+  return (Math.max(L1,L2)+0.05)/(Math.min(L1,L2)+0.05);
+}
+/* walk up for the first opaque background */
+function bgOf(el, w){
+  var n = el;
+  while (n && n.nodeType === 1) {
+    var c = parseRGB(w.getComputedStyle(n).backgroundColor);
+    if (c && c.a > 0.95) return c;
+    n = n.parentElement;
+  }
+  return { r:250,g:248,b:244,a:1 };
+}
+function contrast(el, w){
+  var cs = w.getComputedStyle(el);
+  var fg = parseRGB(cs.color);
+  var bg = bgOf(el, w);
+  var px = parseFloat(cs.fontSize);
+  var bold = (parseInt(cs.fontWeight,10) || 400) >= 700;
+  var large = px >= 24 || (px >= 18.66 && bold);
+  return { r: ratio(fg,bg), large: large, px: px, fg: cs.color, bg: 'rgb('+bg.r+','+bg.g+','+bg.b+')' };
+}
+
+var TARGETS = [
+  ['body copy (.sec-lede)', '.sec-lede'],
+  ['paragraph in split', '.split__body p'],
+  ['nav link', '.nav-primary__link'],
+  ['logo name', '.logo__name'],
+  ['logo sub', '.logo__sub'],
+  ['eyebrow', '.eyebrow'],
+  ['button label', '.btn'],
+  ['ghost button label', '.btn--ghost'],
+  ['product card name', '.product-card__name'],
+  ['product card category', '.product-card__cat'],
+  ['price now', '.price__now'],
+  ['price was', '.price__was'],
+  ['rating count', '.rating__count'],
+  ['footer column title', '.footer-col__title'],
+  ['footer body text', '.footer-brand p'],
+  ['footer link', '.footer-col a'],
+  ['announce bar', '.announce'],
+  ['cat tile count', '.cat-tile__count'],
+  ['field label', '.field__label'],
+  ['field hint', '.field__hint'],
+  ['stat label', '.stat__label'],
+  ['breadcrumb link', '.breadcrumb a']
+];
+
+function run(){
+  var w = document.getElementById('f').contentWindow;
+  var d = w.document;
+
+  out.push('=== TEXT CONTRAST (WCAG AA needs 4.5:1, or 3:1 for large text) ===');
+  TARGETS.forEach(function(t){
+    var el = d.querySelector(t[1]);
+    if (!el) { say(true, t[0] + ' (not on this page)', 'skipped'); return; }
+    var c = contrast(el, w);
+    var need = c.large ? 3 : 4.5;
+    say(c.r >= need, t[0] + '  ' + c.px.toFixed(0) + 'px' + (c.large?' large':' body'),
+        c.r.toFixed(2)+':1  need '+need+'  fg='+c.fg+' bg='+c.bg);
+  });
+
+  out.push('');
+  out.push('=== NON-TEXT CONTRAST (borders / icons need 3:1) ===');
+  function nonText(sel, prop, label, need){
+    var el = d.querySelector(sel);
+    if (!el) { say(true, label+' (absent)','skipped'); return; }
+    var v = parseRGB(w.getComputedStyle(el)[prop]);
+    if (!v) { say(true, label, 'no colour'); return; }
+    var bg = bgOf(el.parentElement || el, w);
+    var r = ratio(v,bg);
+    say(r >= (need||3), label, r.toFixed(2)+':1 need '+(need||3));
+  }
+  nonText('.nav-toggle', 'color', 'mobile menu icon');
+  nonText('.qty__btn', 'color', 'quantity +/- glyph');
+  nonText('.wish', 'color', 'wishlist heart icon');
+  nonText('.filter-range', 'accentColor', 'price slider', 3);
+  nonText('.radio-card', 'borderTopColor', 'checkout radio card border');
+  nonText('.chip', 'borderTopColor', 'filter chip border');
+
+  out.push('');
+  out.push('=== KEYBOARD FOCUS VISIBILITY ===');
+  var focusables = d.querySelectorAll('a[href], button, input:not([type=hidden]), select, textarea');
+  say(focusables.length > 20, 'page exposes many focusable controls', focusables.length);
+  var noName = [];
+  [].forEach.call(focusables, function(el){
+    if (el.offsetParent === null) return;
+    /* aria-hidden decorative wrappers (e.g. card image links) are
+       intentionally out of the accessibility tree - skip them. */
+    if (el.closest('[aria-hidden="true"]')) return;
+    if (el.getAttribute('aria-hidden') === 'true') return;
+    var n = (el.textContent||'').trim() || el.getAttribute('aria-label') ||
+            (el.labels && el.labels[0] ? el.labels[0].textContent.trim() : '') ||
+            el.getAttribute('title') || el.getAttribute('placeholder');
+    if (!n) noName.push(el.tagName + '.' + String(el.className).split(' ')[0]);
+  });
+  say(noName.length === 0, 'every visible control has an accessible name', noName.slice(0,6).join(', '));
+
+  /* outline must be visible when focused */
+  var first = d.querySelector('.nav-primary__link');
+  if (first) {
+    first.focus();
+    var cs = w.getComputedStyle(first, null);
+    var ol = cs.outlineStyle, ow = cs.outlineWidth;
+    say(ol !== 'none' && parseFloat(ow) >= 1, 'focused link shows an outline',
+        'outline=' + ol + ' ' + ow);
+  }
+
+  out.push('');
+  out.push('=== SEMANTICS ===');
+  say(d.querySelectorAll('h1').length === 1, 'exactly one <h1>', d.querySelectorAll('h1').length);
+  var hs = [].map.call(d.querySelectorAll('h1,h2,h3,h4'), function(h){ return +h.tagName[1]; });
+  var jumps = [];
+  for (var i=1;i<hs.length;i++) if (hs[i] > hs[i-1]+1) jumps.push('h'+hs[i-1]+'->h'+hs[i]);
+  say(jumps.length === 0, 'no skipped heading levels', jumps.join(', '));
+  say(!!d.querySelector('main'), 'has <main>');
+  say(d.querySelectorAll('nav').length >= 1, 'has <nav>', d.querySelectorAll('nav').length);
+  say(d.querySelectorAll('footer').length === 1, 'exactly one <footer>');
+  var unlabelled = [];
+  [].forEach.call(d.querySelectorAll('input:not([type=hidden]), select, textarea'), function(el){
+    var has = el.getAttribute('aria-label') || el.getAttribute('aria-labelledby') ||
+              (el.id && d.querySelector('label[for="'+el.id+'"]')) ||
+              (el.closest('label') !== null);
+    if (!has) unlabelled.push(el.name || el.id || el.tagName);
+  });
+  say(unlabelled.length === 0, 'every form control has a label', unlabelled.join(', '));
+  var btns = [].filter.call(d.querySelectorAll('button'), function(b){
+    return !(b.textContent||'').trim() && !b.getAttribute('aria-label'); });
+  say(btns.length === 0, 'no unlabelled icon buttons', btns.length);
+
+  out.push('');
+  out.push('=== REDUCED MOTION ===');
+  /* cssRules on the cross-origin font stylesheet is blocked, so probe the
+     live computed style instead: under emulated reduced motion the
+     transitions on .product-card__img must be neutralised. */
+  var img = d.querySelector('.product-card__img');
+  if (img) {
+    var tr = w.getComputedStyle(img).transitionDuration;
+    say(parseFloat(tr) <= 0.02, 'image transition neutralised under reduced motion',
+        'transition-duration=' + tr);
+  } else {
+    say(true, 'reduced motion', 'no product image on this page');
+  }
+}
+
+var params = new URLSearchParams(location.search);
+var page = params.get('page') || 'index.html';
+document.getElementById('f').src = '../' + page;
+document.getElementById('f').addEventListener('load', function(){
+  setTimeout(function(){
+    try { run(); } catch(e){ out.push('  FAIL harness: '+e.message); }
+    out.unshift('PASS: '+PASS+'   FAIL: '+FAIL+'   WARN: '+WARN);
+    out.unshift('######## A11Y AUDIT — '+page+' ########');
+    var el = document.getElementById('r');
+    el.innerHTML = out.join('\n')
+      .replace(/  ok  /g,'<span class="ok">  ok  </span>')
+      .replace(/  warn /g,'<span class="warn">  warn </span>')
+      .replace(/  FAIL /g,'<span class="bad">  FAIL </span>')
+      .replace(/^===/gm,'<span class="hd">===</span>');
+  }, 400);
+});
+</script></body></html>
